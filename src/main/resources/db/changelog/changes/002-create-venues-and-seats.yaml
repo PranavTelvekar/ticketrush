@@ -1,0 +1,129 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-venues-table
+      author: pranav
+      comment: Places where events happen (e.g. Pune Arena)
+      changes:
+        - createTable:
+            tableName: venues
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_venues
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: address
+                  type: VARCHAR(255)
+              - column:
+                  name: total_seats
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: add-venues-checks
+      author: pranav
+      comment: A venue must have at least one seat
+      changes:
+        - sql:
+            sql: ALTER TABLE venues ADD CONSTRAINT chk_venues_total_seats CHECK (total_seats > 0)
+      rollback:
+        - sql:
+            sql: ALTER TABLE venues DROP CONSTRAINT chk_venues_total_seats
+
+  - changeSet:
+      id: create-venues-city-index
+      author: pranav
+      comment: Events are filtered by city
+      changes:
+        - createIndex:
+            tableName: venues
+            indexName: idx_venues_city
+            columns:
+              - column:
+                  name: city
+
+  - changeSet:
+      id: create-seats-table
+      author: pranav
+      comment: Physical chairs in a venue (one row per chair)
+      changes:
+        - createTable:
+            tableName: seats
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_seats
+                    nullable: false
+              - column:
+                  name: venue_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_seats_venue
+                    references: venues(id)
+                    deleteCascade: true
+              - column:
+                  name: row_label
+                  type: VARCHAR(5)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: seat_number
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: seat_type
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: add-seats-position-unique
+      author: pranav
+      comment: No two chairs with the same row and number in one venue
+      changes:
+        - addUniqueConstraint:
+            tableName: seats
+            constraintName: uq_seats_position
+            columnNames: venue_id, row_label, seat_number
+
+  - changeSet:
+      id: add-seats-checks
+      author: pranav
+      comment: Only REGULAR or PREMIUM seats, and seat numbers start at 1
+      changes:
+        - sql:
+            sql: |
+              ALTER TABLE seats ADD CONSTRAINT chk_seats_type CHECK (seat_type IN ('REGULAR', 'PREMIUM'));
+              ALTER TABLE seats ADD CONSTRAINT chk_seats_number CHECK (seat_number > 0);
+      rollback:
+        - sql:
+            sql: |
+              ALTER TABLE seats DROP CONSTRAINT chk_seats_number;
+              ALTER TABLE seats DROP CONSTRAINT chk_seats_type;

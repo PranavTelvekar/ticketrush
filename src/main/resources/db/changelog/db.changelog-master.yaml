@@ -2,3 +2,15 @@ databaseChangeLog:
   - include:
       file: changes/001-create-users-table.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changes/002-create-venues-and-seats.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/003-create-events-and-event-seats.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/004-create-bookings.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/005-create-payments.yaml
+      relativeToChangelogFile: true

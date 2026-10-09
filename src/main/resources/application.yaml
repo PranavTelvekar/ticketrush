@@ -13,6 +13,9 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
 
   # ── Redis ───────────────────────────────────────────────────
   data:
@@ -25,3 +28,8 @@ management:
   endpoint:
     health:
       show-details: always   # development only: show db/redis status in /actuator/health
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace

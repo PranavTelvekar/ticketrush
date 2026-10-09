@@ -1,0 +1,36 @@
+# Local development infrastructure for TicketRush.
+# Start:  docker compose up -d
+# Stop:   docker compose down
+name: ticketrush
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: ticketrush-postgres
+    environment:
+      POSTGRES_DB: ticketrush
+      POSTGRES_USER: ticketrush
+      POSTGRES_PASSWORD: ticketrush   # development only — never use a password like this in production
+    ports:
+      - "127.0.0.1:5432:5432"         # laptop port 5432 → container port 5432
+    volumes:
+      - ticketrush-pgdata:/var/lib/postgresql   # PostgreSQL 18+ data location
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ticketrush -d ticketrush"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8-alpine
+    container_name: ticketrush-redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  ticketrush-pgdata:

@@ -2,6 +2,7 @@ package com.ticketrush.event;
 
 import com.ticketrush.common.entity.BaseEntity;
 import com.ticketrush.common.exception.BusinessRuleException;
+import com.ticketrush.common.exception.SeatUnavailableException;
 import com.ticketrush.venue.Seat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +16,7 @@ import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 import java.math.BigDecimal;
 
@@ -57,7 +59,7 @@ public class EventSeat extends BaseEntity {
     /** AVAILABLE -> HELD (a user is paying for it). */
     public void hold() {
         if (status != EventSeatStatus.AVAILABLE) {
-            throw new BusinessRuleException("Event seat " + getId() + " is not available (status: " + status + ")");
+            throw new SeatUnavailableException(List.of(getId()));
         }
         status = EventSeatStatus.HELD;
     }

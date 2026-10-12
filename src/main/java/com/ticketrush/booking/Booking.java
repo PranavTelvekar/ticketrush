@@ -2,6 +2,7 @@ package com.ticketrush.booking;
 
 import com.ticketrush.common.entity.BaseEntity;
 import com.ticketrush.common.exception.BusinessRuleException;
+import com.ticketrush.common.exception.BookingExpiredException;
 import com.ticketrush.event.Event;
 import com.ticketrush.event.EventSeat;
 import com.ticketrush.user.User;
@@ -103,7 +104,7 @@ public class Booking extends BaseEntity {
             throw new BusinessRuleException("Only PENDING bookings can be confirmed (current status: " + status + ")");
         }
         if (isHoldExpired()) {
-            throw new BusinessRuleException("Booking hold has expired");
+            throw new BookingExpiredException(getId());
         }
         seats.forEach(EventSeat::book);
         status = BookingStatus.CONFIRMED;

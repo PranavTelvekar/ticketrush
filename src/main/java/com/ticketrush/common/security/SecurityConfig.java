@@ -1,5 +1,7 @@
 package com.ticketrush.common.security;
 
+import com.ticketrush.auth.jwt.JwtAuthenticationFilter;
+import com.ticketrush.auth.jwt.JwtService;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -8,9 +10,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Who may call which URL. Checking the JWT (who the caller is) is added in Step 18.
+ * Who may call which URL, and (through the JWT filter) who the caller is.
  */
 @Configuration
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class SecurityConfig {
 
     private final JsonAuthenticationEntryPoint authenticationEntryPoint;
     private final JsonAccessDeniedHandler accessDeniedHandler;
+    private final JwtService jwtService;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/events/**", "/api/v1/venues/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/bookings/**").hasRole("USER")
                         .anyRequest().authenticated())
+                .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler));

@@ -73,6 +73,11 @@ public class GlobalExceptionHandler {
 
     // ── 409 Conflict ────────────────────────────────────────────
 
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleEmailExists(EmailAlreadyExistsException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, "EMAIL_EXISTS", ex.getMessage(), request, null);
+    }
+
     @ExceptionHandler(SeatUnavailableException.class)
     public ResponseEntity<ApiError> handleSeatUnavailable(SeatUnavailableException ex, HttpServletRequest request) {
         return build(HttpStatus.CONFLICT, "SEAT_UNAVAILABLE", ex.getMessage(), request,

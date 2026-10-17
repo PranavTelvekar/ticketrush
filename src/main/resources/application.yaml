@@ -1,6 +1,10 @@
 spring:
   application:
     name: TicketRush
+  
+  # Read local secrets (JWT_SECRET, ...) from the git-ignored .env file, if it exists
+  config:
+    import: optional:file:.env[.properties]
 
   # ── PostgreSQL ──────────────────────────────────────────────
   datasource:
@@ -38,6 +42,12 @@ springdoc:
     operations-sorter: method       # inside a group: GET, POST, PUT, PATCH, DELETE
     display-request-duration: true  # show how long each "Try it out" call took
     persist-authorization: true     # remember the JWT you paste, even after a page refresh
+
+# ── TicketRush settings ───────────────────────────────────────
+app:
+  jwt:
+    secret: ${JWT_SECRET:}  # Base64 key of at least 32 bytes; comes from .env or an environment variable
+    expiration: 1h          # how long a login token is valid
 
 logging:
   level:

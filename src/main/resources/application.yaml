@@ -29,6 +29,16 @@ management:
     health:
       show-details: always   # development only: show db/redis status in /actuator/health
 
+# ── API docs (Swagger UI) ─────────────────────────────────────
+springdoc:
+  default-produces-media-type: application/json   # our API always answers with JSON
+  swagger-ui:
+    path: /swagger-ui.html          # short address; redirects to /swagger-ui/index.html
+    tags-sorter: alpha              # groups (tags) in A→Z order
+    operations-sorter: method       # inside a group: GET, POST, PUT, PATCH, DELETE
+    display-request-duration: true  # show how long each "Try it out" call took
+    persist-authorization: true     # remember the JWT you paste, even after a page refresh
+
 logging:
   level:
     org.hibernate.SQL: debug
